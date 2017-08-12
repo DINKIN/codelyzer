@@ -179,7 +179,8 @@ export const parseTemplate = (
         ).templateAst;
       })
       .else(() => {
-        result = tmplParser.tryParse(
+        result = tmplParser.tryParseHtml(
+          htmlParser.parse(template, '', true),
           compiler.CompileDirectiveMetadata.create({
             type,
             template: templateMetadata,
@@ -200,11 +201,9 @@ export const parseTemplate = (
             rendererType: null,
             componentFactory: null
           }),
-          template,
           defaultDirectives,
           [],
-          [NO_ERRORS_SCHEMA],
-          ''
+          [NO_ERRORS_SCHEMA]
         ).templateAst;
       });
   } catch (e) {

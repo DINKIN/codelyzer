@@ -15,8 +15,8 @@ const getExpressionDisplacement = (binding: any) => {
   let totalLength = 0;
   let result = 0;
   if (binding instanceof ast.BoundEventAst ||
-      binding instanceof ast.BoundElementPropertyAst ||
-      binding instanceof ast.BoundDirectivePropertyAst) {
+    binding instanceof ast.BoundElementPropertyAst ||
+    binding instanceof ast.BoundDirectivePropertyAst) {
     // subBindingLen is for [class.foo], [style.foo], the length of
     // the binding type. For event it is 0. (+1 because of the ".")
     let subBindingLen = 0;
@@ -25,17 +25,17 @@ const getExpressionDisplacement = (binding: any) => {
       // The length of the binding type
       switch (prop.type) {
         case ast.PropertyBindingType.Animation:
-        subBindingLen = 'animate'.length + 1;
-        break;
+          subBindingLen = 'animate'.length + 1;
+          break;
         case ast.PropertyBindingType.Attribute:
-        subBindingLen = 'attr'.length + 1;
-        break;
+          subBindingLen = 'attr'.length + 1;
+          break;
         case ast.PropertyBindingType.Class:
-        subBindingLen = 'class'.length + 1;
-        break;
+          subBindingLen = 'class'.length + 1;
+          break;
         case ast.PropertyBindingType.Style:
-        subBindingLen = 'style'.length + 1;
-        break;
+          subBindingLen = 'style'.length + 1;
+          break;
       }
     }
     // For [class.foo]=":
@@ -54,7 +54,7 @@ const getExpressionDisplacement = (binding: any) => {
       // [ngForOf] requires different logic because it gets desugered from *ngFor
       const content = binding.sourceSpan.end.file.content;
       const ngForSubstr = content.substring(binding.sourceSpan.start.offset, binding.sourceSpan.end.offset);
-      result = ngForSubstr.lastIndexOf((binding.value as any).source) + '*ngFor'.length;
+      result = ngForSubstr.lastIndexOf((binding.value as any).source) + '*ngFor="let pony'.length;
     } else {
       valLen = binding.value.span.end;
     }
@@ -96,14 +96,14 @@ export class BasicTemplateAstVisitor extends SourceMappingVisitor implements ast
     protected context: ComponentMetadata,
     protected templateStart: number,
     private expressionVisitorCtrl: RecursiveAngularExpressionVisitorCtr = RecursiveAngularExpressionVisitor) {
-      super(sourceFile, _originalOptions, context.template.template, templateStart);
-    }
+    super(sourceFile, _originalOptions, context.template.template, templateStart);
+  }
 
   visit?(node: ast.TemplateAst, context: any): any {
     node.visit(this, context);
   }
 
-  visitNgContent(ast: ast.NgContentAst, context: any): any {}
+  visitNgContent(ast: ast.NgContentAst, context: any): any { }
 
   visitEmbeddedTemplate(ast: ast.EmbeddedTemplateAst, context: any): any {
     ast.directives.forEach(d => this.visit(d, context));
@@ -123,7 +123,7 @@ export class BasicTemplateAstVisitor extends SourceMappingVisitor implements ast
     element.directives.forEach(d => this.visit(d, context));
   }
 
-  visitReference(ast: ast.ReferenceAst, context: any): any {}
+  visitReference(ast: ast.ReferenceAst, context: any): any { }
 
   visitVariable(ast: ast.VariableAst, context: any): any {
     this._variables[ast.name] = true;
@@ -131,30 +131,30 @@ export class BasicTemplateAstVisitor extends SourceMappingVisitor implements ast
 
   visitEvent(ast: ast.BoundEventAst, context: any): any {
     this._variables['$event'] = true;
-    this.visitNgTemplateAST(ast.handler,
-        this.templateStart + getExpressionDisplacement(ast));
+    this.visitNgExpressionAST(ast.handler,
+      this.templateStart + getExpressionDisplacement(ast));
     this._variables['$event'] = false;
   }
 
   visitElementProperty(prop: ast.BoundElementPropertyAst, context: any): any {
     const ast: any = (<e.ASTWithSource>prop.value).ast;
     ast.interpolateExpression = (<any>prop.value).source;
-    this.visitNgTemplateAST(prop.value, this.templateStart + getExpressionDisplacement(prop));
+    this.visitNgExpressionAST(prop.value, this.templateStart + getExpressionDisplacement(prop));
   }
 
-  visitAttr(ast: ast.AttrAst, context: any): any {}
+  visitAttr(ast: ast.AttrAst, context: any): any { }
 
   visitBoundText(text: ast.BoundTextAst, context: any): any {
     if (ExpTypes.ASTWithSource(text.value)) {
       // Note that will not be reliable for different interpolation symbols
       const ast: any = (<e.ASTWithSource>text.value).ast;
       ast.interpolateExpression = (<any>text.value).source;
-      this.visitNgTemplateAST(ast,
-          this.templateStart + getExpressionDisplacement(text));
+      this.visitNgExpressionAST(ast,
+        this.templateStart + getExpressionDisplacement(text));
     }
   }
 
-  visitText(text: ast.TextAst, context: any): any {}
+  visitText(text: ast.TextAst, context: any): any { }
 
   visitDirective(ast: ast.DirectiveAst, context: any): any {
     ast.inputs.forEach(o => this.visit(o, context));
@@ -164,15 +164,15 @@ export class BasicTemplateAstVisitor extends SourceMappingVisitor implements ast
 
   visitDirectiveProperty(prop: ast.BoundDirectivePropertyAst, context: any): any {
     if (ExpTypes.ASTWithSource(prop.value)) {
-      this.visitNgTemplateAST(prop.value, this.templateStart + getExpressionDisplacement(prop));
+      this.visitNgExpressionAST(prop.value, this.templateStart + getExpressionDisplacement(prop));
     }
   }
 
-  protected visitNgTemplateAST(ast: e.AST, templateStart: number) {
-    const templateVisitor =
-      new this.expressionVisitorCtrl(this.getSourceFile(), this._originalOptions, this.context, templateStart);
-    templateVisitor.preDefinedVariables = this._variables;
-    templateVisitor.visit(ast);
-    templateVisitor.getFailures().forEach(f => this.addFailure(f));
+  protected visitNgExpressionAST(ast: e.AST, exprStart: number) {
+    const expressionVisitor =
+      new this.expressionVisitorCtrl(this.getSourceFile(), this._originalOptions, this.context, exprStart);
+    expressionVisitor.preDefinedVariables = this._variables;
+    expressionVisitor.visit(ast);
+    expressionVisitor.getFailures().forEach(f => this.addFailure(f));
   }
 }

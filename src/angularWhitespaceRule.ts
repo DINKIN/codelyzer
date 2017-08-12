@@ -47,13 +47,13 @@ class InterpolationWhitespaceVisitor extends BasicTemplateAstVisitor implements 
           const length = match[0].length;
           context.addFailure(
             context.createFailure(
-            start, length, failure, [
-            new Lint.Replacement(
-              absolutePosition,
-              length,
-              `${InterpolationOpen} ${match[0].replace(InterpolationOpen, '').replace(InterpolationClose, '').trim()} ${InterpolationClose}`
-            )
-          ]));
+              start, length, failure, [
+                new Lint.Replacement(
+                  absolutePosition,
+                  length,
+                  `${InterpolationOpen} ${match[0].replace(InterpolationOpen, '').replace(InterpolationClose, '').trim()} ${InterpolationClose}`
+                )
+              ]));
         }
       };
       InterpolationNoWhitespaceRe.lastIndex = 0;

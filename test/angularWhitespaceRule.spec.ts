@@ -123,7 +123,7 @@ describe('angular-whitespace', () => {
         assertSuccess('angular-whitespace', ast, ['check-pipe']);
       });
 
-      it('should succeed with ngFor', () => {
+      it.only('should succeed with ngFor', () => {
         let source = `
         @Component({
           selector: 'foo',
@@ -309,8 +309,8 @@ describe('failure', () => {
         const failures = assertMultipleAnnotated({
           ruleName: 'angular-whitespace',
           failures: [
-            {char: '~', msg: 'Missing whitespace in interpolation; expecting {{ expr }}', },
-            {char: '^', msg: 'Extra whitespace in interpolation; expecting {{ expr }}', },
+            { char: '~', msg: 'Missing whitespace in interpolation; expecting {{ expr }}', },
+            { char: '^', msg: 'Extra whitespace in interpolation; expecting {{ expr }}', },
           ],
           source,
           options: ['check-interpolation']
@@ -659,8 +659,8 @@ describe('pipes', () => {
     const failures = assertMultipleAnnotated({
       ruleName: 'angular-whitespace',
       failures: [
-        {char: '~', msg: 'The pipe operator should be surrounded by one space on each side, i.e. " | ".', },
-        {char: '^', msg: 'The pipe operator should be surrounded by one space on each side, i.e. " | ".', },
+        { char: '~', msg: 'The pipe operator should be surrounded by one space on each side, i.e. " | ".', },
+        { char: '^', msg: 'The pipe operator should be surrounded by one space on each side, i.e. " | ".', },
       ],
       source,
       options: ['check-pipe']
